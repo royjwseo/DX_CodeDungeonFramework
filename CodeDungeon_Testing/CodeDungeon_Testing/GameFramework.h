@@ -39,30 +39,28 @@ private:
 
  //-----------------------------------------------------------------------------------------------------
  
-	ID3D12Resource* m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
-	ID3D12DescriptorHeap* m_pd3dRtvDescriptorHeap;
+	ComPtr<ID3D12Resource> m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
+	ComPtr<ID3D12DescriptorHeap> m_pd3dRtvDescriptorHeap;
 	UINT m_nRtvDescriptorIncrementSize;
 
-	ID3D12Resource* m_pd3dDepthStencilBuffer;
-	ID3D12DescriptorHeap* m_pd3dDsvDescriptorHeap;
+	ComPtr<ID3D12Resource> m_pd3dDepthStencilBuffer;
+	ComPtr<ID3D12DescriptorHeap> m_pd3dDsvDescriptorHeap;
 	UINT m_nDsvDescriptorIncrementSize;
 
-	ID3D12CommandQueue* m_pd3dCommandQueue;
-	ID3D12CommandAllocator* m_pd3dCommandAllocator; //이 포인터로 CommandList가 어디에 있는 명령어 메모리를 가져다 쓸 건지 알 수 있다.
-	//CreateCommandAllocator()함수를 통해 CommandAllocator를 만든다.
-	ID3D12GraphicsCommandList* m_pd3dCommandList; //렌더링을 위한 그래픽 명령들의 리스트이다.
 
-	ID3D12PipelineState* m_pd3dPipelineState;
-	//그래픽스 파이프라인 상태 객체에 대한 인터페이스 포인터이다.
- //----------------------------------------------------------------------------------------------------------
-
-	ID3D12Fence* m_pd3dFence;
+	ComPtr<ID3D12CommandQueue> m_pd3dCommandQueue;
+	ComPtr<ID3D12CommandAllocator> m_pd3dCommandAllocator;
+	ComPtr<ID3D12GraphicsCommandList> m_pd3dCommandList;
+	
+	ComPtr<ID3D12PipelineState> m_pd3dPipelineState;
+	
+	ComPtr<ID3D12Fence> m_pd3dFence;
 	UINT64 m_nFenceValues[m_nSwapChainBuffers]; //(값의 범위가 0 ~ 2^64 -1) 프레임 번호이다. 매 프레임마다 값이 늘어난다.
 	HANDLE m_hFenceEvent; // CreateEventEx(NULL, bool Event_name, bool Flags, EVENT_ALL_ACCESS)의 함수가 HANDLE값 반환
 
 	CScene* m_pScene;
 
-	public:
+public:
 		CCamera* m_pCamera = NULL;
 public:
 	CGameFramework();
