@@ -6,6 +6,8 @@
 
 //-----------------------------------------
 //Device
+
+
 void DeviceAndFactory::InitDeviceAndFactory()
 {
 	CreateDirect3DDevice();
@@ -17,31 +19,35 @@ void DeviceAndFactory::CreateDirect3DDevice()
 
 	UINT nDXGIFactoryFlags = 0;
 #if defined(_DEBUG) //전처리기 조건문 #if있으면 #endif 는 무조건 세트, D3D12 디버그층 활성화
-	ID3D12Debug* pd3dDebugController = NULL;
-
-	hResult = D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)&pd3dDebugController);//(IID_PPV_ARGS(&pd3dDebugController)사용가능
+	
+	ComPtr<ID3D12Debug>pd3dDebugController = nullptr;
+	hResult = D3D12GetDebugInterface(IID_PPV_ARGS(&pd3dDebugController));//(IID_PPV_ARGS(&pd3dDebugController)사용가능
 	if (pd3dDebugController) {//내 해석: pd3dDebugController 포인터에 널값 없으면 무언가 초기화하는
 		pd3dDebugController->EnableDebugLayer();
-		pd3dDebugController->Release();
 	}
 	nDXGIFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;//이따 찾아보기
 #endif
 
-	hResult = ::CreateDXGIFactory2(nDXGIFactoryFlags, __uuidof(IDXGIFactory4), (void**)&m_cpdxgiFactory);//(IID_PPV_ARGS(&m_pdxgiFactory)
+	hResult = ::CreateDXGIFactory2(nDXGIFactoryFlags, IID_PPV_ARGS(&m_cpdxgiFactory));//(IID_PPV_ARGS(&m_pdxgiFactory)
 
-	IDXGIAdapter1* pd3dAdapter = NULL;
-	for (UINT i = 0; DXGI_ERROR_NOT_FOUND != m_cpdxgiFactory->EnumAdapters1(i, &pd3dAdapter); i++) {
+	ComPtr<IDXGIAdapter1> pd3dAdapter = nullptr;
+
+
+	for (UINT i = 0; m_cpdxgiFactory->EnumAdapters1(i, &pd3dAdapter) != DXGI_ERROR_NOT_FOUND; ++i) {
 		DXGI_ADAPTER_DESC1 dxgiAdapterDesc;
 		pd3dAdapter->GetDesc1(&dxgiAdapterDesc);
-		if (dxgiAdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)continue;
-		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), (void**)&m_cpd3dDevice)))break;
 
+		if (dxgiAdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+			continue;
+
+		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_cpd3dDevice))))
+			break;
 	}
 
 	if (!pd3dAdapter) {
-		m_cpdxgiFactory->EnumWarpAdapter(__uuidof(IDXGIAdapter1), (void**)&pd3dAdapter);
-		D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)&m_cpd3dDevice);
-	}//특성 레벨 12.0을 지원하는 하드웨어 디바이스를 생성할 수 없으면 WARP 디바이스를 생성한다.
+		m_cpdxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&pd3dAdapter));
+		D3D12CreateDevice(pd3dAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_cpd3dDevice));
+	}
 
 	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS d3dMsaaQualityLevels;
 	d3dMsaaQualityLevels.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -54,20 +60,20 @@ void DeviceAndFactory::CreateDirect3DDevice()
 	m_bMsaa4xEnable = (m_nMsaa4xQualityLevels > 1) ? true : false;
 	//다중 샘플의 품질 수준이 1보다 크면 다중 샘플링을 활성화한다. 
 
-	hResult = m_cpd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)&m_cpd3dFence);
+	hResult = m_cpd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS (&m_cpd3dFence));
 
 	//펜스를 생성하고 펜스 값을 0으로 설정한다
 
 	m_hFenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 
 
-	if (pd3dAdapter) pd3dAdapter->Release();
+	
 }
 //-----------------------------------------
 
 
 //---------------------------
-void SwapChainAndRtvDsvHeap::InitSwapChainAndRtvDsvHeap(ComPtr<IDXGIFactory4> _Factory, ComPtr<ID3D12Device> _Device, ComPtr< ID3D12CommandQueue> _CmdQueue, bool MsaaEnable, uint16 MsaaQualityLevels)
+void SwapChainAndRtvDsvHeap::InitSwapChainAndRtvDsvHeap(ComPtr<IDXGIFactory4>& _Factory,  ComPtr<ID3D12Device>& _Device,  ComPtr< ID3D12CommandQueue>& _CmdQueue, bool MsaaEnable, uint16 MsaaQualityLevels)
 {
 	m_nRtvDescriptorIncrementSize = 0;
 	m_nDsvDescriptorIncrementSize = 0;
@@ -79,9 +85,12 @@ void SwapChainAndRtvDsvHeap::InitSwapChainAndRtvDsvHeap(ComPtr<IDXGIFactory4> _F
 	CreateRtvAndDsvDescriptorHeaps(_Device);
 	CreateSwapChain(_Factory,_Device,_CmdQueue, MsaaEnable, MsaaQualityLevels);
 	CreateDepthStencilView(_Device, MsaaEnable,MsaaQualityLevels);
+
+
+	
 }
 
-void SwapChainAndRtvDsvHeap::ChangeSwapChainState(ComPtr<ID3D12Device> _Device)
+void SwapChainAndRtvDsvHeap::ChangeSwapChainState( ComPtr<ID3D12Device>& _Device)
 {
 
 	BOOL bFullScreenState = FALSE;
@@ -104,24 +113,25 @@ void SwapChainAndRtvDsvHeap::ChangeSwapChainState(ComPtr<ID3D12Device> _Device)
 		m_nWndClientHeight, dxgiSwapChainDesc.BufferDesc.Format, dxgiSwapChainDesc.Flags);
 	m_nSwapChainBufferIndex = m_cpdxgiSwapChain->GetCurrentBackBufferIndex();
 	CreateRenderTargetViews(_Device);
+	
 }
 
 
-void SwapChainAndRtvDsvHeap::CreateRenderTargetViews(ComPtr<ID3D12Device> _Device)
+void SwapChainAndRtvDsvHeap::CreateRenderTargetViews( ComPtr<ID3D12Device>& _Device)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle =
 		m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 	for (UINT i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++) {
-		m_cpdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&m_ppd3dRenderTargetBuffers[i]);
+		m_cpdxgiSwapChain->GetBuffer(i,IID_PPV_ARGS(& m_ppd3dRenderTargetBuffers[i]));
 		_Device->CreateRenderTargetView(m_ppd3dRenderTargetBuffers[i].Get(), NULL, d3dRtvCPUDescriptorHandle);
 		d3dRtvCPUDescriptorHandle.ptr += m_nRtvDescriptorIncrementSize;
 
 	}
-
+	
 }
 
-void SwapChainAndRtvDsvHeap::CreateDepthStencilView(ComPtr<ID3D12Device> _Device, bool MssaaEnable, uint16 MsaaQualityLevels)
+void SwapChainAndRtvDsvHeap::CreateDepthStencilView( ComPtr<ID3D12Device>& _Device, bool MssaaEnable, uint16 MsaaQualityLevels)
 {
 	D3D12_RESOURCE_DESC d3dResourceDesc;
 	d3dResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -150,7 +160,7 @@ void SwapChainAndRtvDsvHeap::CreateDepthStencilView(ComPtr<ID3D12Device> _Device
 	d3dClearValue.DepthStencil.Stencil = 0;
 	_Device->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE,
 		&d3dResourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dClearValue,
-		__uuidof(ID3D12Resource), (void**)&m_pd3dDepthStencilBuffer);
+		IID_PPV_ARGS (& m_pd3dDepthStencilBuffer));
 	//깊이-스텐실 버퍼를 생성한다. 
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle =
 		m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -158,11 +168,11 @@ void SwapChainAndRtvDsvHeap::CreateDepthStencilView(ComPtr<ID3D12Device> _Device
 		d3dDsvCPUDescriptorHandle);
 	//깊이-스텐실 버퍼 뷰를 생성한다.
 
-
+	
 }
 
 //->여기 개념부터 보고 작성
-void SwapChainAndRtvDsvHeap::CreateRtvAndDsvDescriptorHeaps(ComPtr<ID3D12Device> _Device) {
+void SwapChainAndRtvDsvHeap::CreateRtvAndDsvDescriptorHeaps( ComPtr<ID3D12Device>& _Device) {
 
 	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
 	::ZeroMemory(&d3dDescriptorHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
@@ -170,18 +180,20 @@ void SwapChainAndRtvDsvHeap::CreateRtvAndDsvDescriptorHeaps(ComPtr<ID3D12Device>
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
-	HRESULT hResult = _Device->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dRtvDescriptorHeap);
+	HRESULT hResult = _Device->CreateDescriptorHeap(&d3dDescriptorHeapDesc, IID_PPV_ARGS(& m_pd3dRtvDescriptorHeap));
 	//랜더 타겟 서술자 힙(서술자 개수= 스왑체인 버퍼 개수) 을 생성
 	m_nRtvDescriptorIncrementSize = _Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//렌더 타겟 서술자 힙의 원소의 크기를 저장한다.
 
 	d3dDescriptorHeapDesc.NumDescriptors = 1;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-	hResult = _Device->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dDsvDescriptorHeap);
+	hResult = _Device->CreateDescriptorHeap(&d3dDescriptorHeapDesc, IID_PPV_ARGS(&m_pd3dDsvDescriptorHeap));
+
+
 }
 
 
-void SwapChainAndRtvDsvHeap::CreateSwapChain(ComPtr<IDXGIFactory4> _Factory, ComPtr<ID3D12Device> _Device, ComPtr< ID3D12CommandQueue> _CmdQueue, bool MssaaEnable, uint16 MsaaQualityLevels)
+void SwapChainAndRtvDsvHeap::CreateSwapChain( ComPtr<IDXGIFactory4>& _Factory,  ComPtr<ID3D12Device>& _Device,  ComPtr< ID3D12CommandQueue>& _CmdQueue, bool MssaaEnable, uint16 MsaaQualityLevels)
 {
 	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
 	::ZeroMemory(&dxgiSwapChainDesc, sizeof(dxgiSwapChainDesc));
@@ -230,23 +242,24 @@ void SwapChainAndRtvDsvHeap::CreateSwapChain(ComPtr<IDXGIFactory4> _Factory, Com
 //---------------------------
 
 
-void CommandQueue::CreateCommandQueueAndList(ComPtr<ID3D12Device> _Device) {
+void CommandQueue::CreateCommandQueueAndList(ComPtr<ID3D12Device>& _Device) {
 
 	D3D12_COMMAND_QUEUE_DESC d3dCommandQueueDesc;
 	::ZeroMemory(&d3dCommandQueueDesc, sizeof(D3D12_COMMAND_QUEUE_DESC));
 	d3dCommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;//기본 명령 큐로 정함
 	d3dCommandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;//우리는 GPU가 직접 실행 할 수 있는 CommandList를 담은 CommandQueue를 만들기 위해 GPU가 직접 실행할 수 있는 명령 버퍼 리스트
-	HRESULT hResult = _Device->CreateCommandQueue(&d3dCommandQueueDesc, __uuidof(ID3D12CommandQueue), (void**)&m_pd3dCommandQueue);
+	HRESULT hResult = _Device->CreateCommandQueue(&d3dCommandQueueDesc, IID_PPV_ARGS (&m_pd3dCommandQueue));
 	//직접(direct) 명령 큐를 생성
 
-	hResult = _Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_pd3dCommandAllocator);
+	hResult = _Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS (&m_pd3dCommandAllocator));
 	//직접(direct) 명령 할당자를 생성한다.
 
-	hResult = _Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator.Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dCommandList);
+	hResult = _Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator.Get(), NULL, IID_PPV_ARGS (&m_pd3dCommandList));
 	//직접(dircect) 명령 리스트를 생성한다.                                        //연관된 명령 할당자  //초기 파이프라인 상태 객체
 
 	hResult = m_pd3dCommandList->Close();
 	//명령리스트는 초기상태가 열린상태이므로 닫힌 상태로 만든다.
+
 }
 //-----------------------------
 
@@ -254,24 +267,27 @@ void CommandQueue::CreateCommandQueueAndList(ComPtr<ID3D12Device> _Device) {
 CGameFramework::CGameFramework()
 {
 
-	m_spDevice = make_shared<DeviceAndFactory>();
-	m_spSwapChainAndRtvDsvHeap = make_shared<SwapChainAndRtvDsvHeap>();
-	m_spCommandQueue = make_shared<CommandQueue>();
-
-	for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++)m_spDevice->m_nFenceValues[i] = 0;
-	m_pScene = NULL;
 	
-	_tcscpy_s(m_pszFrameRate, _T("LapProject ("));
 }
 
 CGameFramework::~CGameFramework()
 {
+	
 
 }
 
 //다음 함수는 응용 프로그램이 실행되어 주 윈도우가 생성되면 호출된다는 것에 유의하라. 
 bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 {
+	m_spDevice = make_shared<DeviceAndFactory>();
+	m_spSwapChainAndRtvDsvHeap = make_shared<SwapChainAndRtvDsvHeap>();
+	m_spCommandQueue = make_shared<CommandQueue>();
+
+	for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++)m_spDevice->m_nFenceValues[i] = 0;
+	m_pScene = NULL;
+
+	_tcscpy_s(m_pszFrameRate, _T("LapProject ("));
+
 	m_spSwapChainAndRtvDsvHeap->m_hInstance = hInstance;
 	m_spSwapChainAndRtvDsvHeap->m_hWnd = hMainWnd;
 	m_spDevice->InitDeviceAndFactory();
@@ -291,11 +307,12 @@ void CGameFramework::OnDestroy()
 	m_spSwapChainAndRtvDsvHeap->GetSwapChain()->SetFullscreenState(FALSE, NULL);
 
 #if defined(_DEBUG)
-	IDXGIDebug1* pdxgiDebug = NULL;
-	DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), (void**)&pdxgiDebug);
+	ComPtr<IDXGIDebug1> pdxgiDebug = nullptr;
+
+	DXGIGetDebugInterface1(0, IID_PPV_ARGS(&pdxgiDebug));
 	HRESULT hResult = pdxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL,
 		DXGI_DEBUG_RLO_DETAIL);
-	pdxgiDebug->Release();
+	
 #endif
 }
 
@@ -386,8 +403,9 @@ void CGameFramework::FrameAdvance()
 
 	hResult = m_spCommandQueue->GetCmdList()->Close();
 	//명령 리스트를 닫힌 상태로 만든다. 
-	ID3D12CommandList* ppd3dCommandLists[] = { m_spCommandQueue->GetCmdList().Get() };
-	m_spCommandQueue->GetCmdQueue()->ExecuteCommandLists(1, ppd3dCommandLists);
+	ComPtr<ID3D12CommandList>ppd3dCommandLists[]={ m_spCommandQueue->GetCmdList().Get() };
+	
+	m_spCommandQueue->GetCmdQueue()->ExecuteCommandLists(1, ppd3dCommandLists->GetAddressOf());
 	//명령 리스트를 명령 큐에 추가하여 실행한다.
 	WaitForGpuComplete();
 	m_spSwapChainAndRtvDsvHeap->GetSwapChain()->Present(0, 0);
@@ -416,8 +434,8 @@ void CGameFramework::BuildObjects()
 	m_pScene->BuildObjects(m_spDevice->GetDevice().Get(), m_spCommandQueue->GetCmdList().Get());
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다.
 	m_spCommandQueue->GetCmdList()->Close();
-	ID3D12CommandList* ppd3dCommandLists[] = { m_spCommandQueue->GetCmdList().Get() };
-	m_spCommandQueue->GetCmdQueue()->ExecuteCommandLists(1, ppd3dCommandLists);
+	ComPtr<ID3D12CommandList>ppd3dCommandLists[] = { m_spCommandQueue->GetCmdList().Get() };
+	m_spCommandQueue->GetCmdQueue()->ExecuteCommandLists(1, ppd3dCommandLists->GetAddressOf());
 	//그래픽 명령 리스트들이 모두 실행될 때까지 기다린다.
 	WaitForGpuComplete();
 	//그래픽 리소스들을 생성하는 과정에 생성된 업로드 버퍼들을 소멸시킨다. 

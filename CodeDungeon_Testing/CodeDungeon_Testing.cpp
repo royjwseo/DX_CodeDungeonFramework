@@ -7,8 +7,9 @@
 
 // 전역 변수:
 
-CGameFramework gGameFramework;
+//CGameFramework gGameFramework;
 
+unique_ptr<CGameFramework> gGameFrameWork = make_unique<CGameFramework>();
 //H = 핸들 = 포인터 = 주소
 //구체적인 어떤 대상에 붙여진 번호
 HINSTANCE hInst;                                // 현재 인스턴스입니다. 인스턴스 = 프로그램의 정보
@@ -48,6 +49,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //응용 프로그램 시작 진
 
     MSG msg;
 
+    
+
     while (1)
     {
         if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -61,10 +64,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //응용 프로그램 시작 진
         }
         else
         {
-            gGameFramework.FrameAdvance();
+            gGameFrameWork->FrameAdvance();
+            
         }
     }
-    gGameFramework.OnDestroy();
+    gGameFrameWork->OnDestroy();
 
     return (int)msg.wParam;
 }
@@ -119,7 +123,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     HWND hMainWnd = CreateWindow(szWindowClass, szTitle, dwStyle, CW_USEDEFAULT,
         CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, hInstance, NULL);
     if (!hMainWnd) return(FALSE);
-    gGameFramework.OnCreate(hInstance, hMainWnd);
+    gGameFrameWork->OnCreate(hInstance, hMainWnd);
     ::ShowWindow(hMainWnd, nCmdShow);
     ::UpdateWindow(hMainWnd);
 #ifdef _WITH_SWAPCHAIN_FULLSCREEN_STATE
@@ -158,7 +162,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_MOUSEMOVE:
     case WM_KEYDOWN:
     case WM_KEYUP:
-        gGameFramework.OnProcessingWindowMessage(hWnd, message, wParam, lParam);
+        gGameFrameWork->OnProcessingWindowMessage(hWnd, message, wParam, lParam);
         break;
     case WM_COMMAND:
         wmId = LOWORD(wParam);
