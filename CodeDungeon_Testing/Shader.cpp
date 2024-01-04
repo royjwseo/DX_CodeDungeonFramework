@@ -8,12 +8,7 @@ CShader::CShader()
 
 CShader::~CShader()
 {
-	if (m_ppd3dPipelineStates)
-	{
-		for (int i = 0; i < m_nPipelineStates; i++) if (m_ppd3dPipelineStates[i])
-			m_ppd3dPipelineStates[i]->Release();
-		delete[] m_ppd3dPipelineStates;
-	}
+
 }
 
 
@@ -84,46 +79,33 @@ D3D12_INPUT_LAYOUT_DESC CShader::CreateInputLayout()
 	return(d3dInputLayoutDesc);
 }
 //정점 셰이더 바이트 코드를 생성(컴파일)한다. 
-D3D12_SHADER_BYTECODE CShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+
+
+//그래픽스 파이프라인 상태 객체를 생성한다.
+void CShader::CreateShader(const wstring& shaderFile, const string& vs, const string& ps,const ComPtr<ID3D12Device>& _Device, const ComPtr<ID3D12RootSignature>& _RootSignature)
 {
-	D3D12_SHADER_BYTECODE d3dShaderByteCode;
-	d3dShaderByteCode.BytecodeLength = 0;
-	d3dShaderByteCode.pShaderBytecode = NULL;
-	return(d3dShaderByteCode);
-}
-//픽셀 셰이더 바이트 코드를 생성(컴파일)한다. 
-D3D12_SHADER_BYTECODE CShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
-{
-	D3D12_SHADER_BYTECODE d3dShaderByteCode;
-	d3dShaderByteCode.BytecodeLength = 0;
-	d3dShaderByteCode.pShaderBytecode = NULL;
-	return(d3dShaderByteCode);
-}
-//셰이더 소스 코드를 컴파일하여 바이트 코드 구조체를 반환한다. 
-D3D12_SHADER_BYTECODE CShader::CompileShaderFromFile(WCHAR* pszFileName, LPCSTR pszShaderName, LPCSTR pszShaderProfile, ID3DBlob** ppd3dShaderBlob)
-{
+	ComPtr<ID3DBlob> pd3dVertexShaderBlob, pd3dPixelShaderBlob,error;
+
 	UINT nCompileFlags = 0;
 #if defined(_DEBUG)
 	nCompileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
-	::D3DCompileFromFile(pszFileName, NULL, NULL, pszShaderName, pszShaderProfile,
-		nCompileFlags, 0, ppd3dShaderBlob, NULL);
-	D3D12_SHADER_BYTECODE d3dShaderByteCode;
-	d3dShaderByteCode.BytecodeLength = (*ppd3dShaderBlob)->GetBufferSize();
-	d3dShaderByteCode.pShaderBytecode = (*ppd3dShaderBlob)->GetBufferPointer();
-	return(d3dShaderByteCode);
-}
+	DX::ThrowIfFailed(::D3DCompileFromFile(shaderFile.c_str(), NULL, NULL, vs.c_str(), "vs_5_1",
+		nCompileFlags, 0, pd3dVertexShaderBlob.GetAddressOf(), &error));
+	DX::ThrowIfFailed(::D3DCompileFromFile(shaderFile.c_str(), NULL, NULL, ps.c_str(), "ps_5_1",
+		nCompileFlags, 0, pd3dPixelShaderBlob.GetAddressOf(), &error));
+	if (error)
+	{
+		OutputDebugStringA(reinterpret_cast<char*>(error->GetBufferPointer()));
+	}
+	
 
-//그래픽스 파이프라인 상태 객체를 생성한다.
-void CShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature
-	* pd3dGraphicsRootSignature)
-{
-	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL;
+
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
 	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
-	d3dPipelineStateDesc.VS = CreateVertexShader(&pd3dVertexShaderBlob);
-	d3dPipelineStateDesc.PS = CreatePixelShader(&pd3dPixelShaderBlob);
+	d3dPipelineStateDesc.pRootSignature = _RootSignature.Get();
+	d3dPipelineStateDesc.VS = CD3DX12_SHADER_BYTECODE(pd3dVertexShaderBlob.Get());
+	d3dPipelineStateDesc.PS = CD3DX12_SHADER_BYTECODE(pd3dPixelShaderBlob.Get());
 	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
 	d3dPipelineStateDesc.BlendState = CreateBlendState();
 	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();
@@ -135,38 +117,36 @@ void CShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature
 	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	d3dPipelineStateDesc.SampleDesc.Count = 1;
 	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
-	pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc,
-		__uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[0]);
-	if (pd3dVertexShaderBlob) pd3dVertexShaderBlob->Release();
-	if (pd3dPixelShaderBlob) pd3dPixelShaderBlob->Release();
+	_Device->CreateGraphicsPipelineState(&d3dPipelineStateDesc,
+		IID_PPV_ARGS(&m_pd3dPipelineStates));
+	
 	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs) delete[]
 		d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }
 
 
-void CShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void CShader::OnPrepareRender(const ComPtr<ID3D12GraphicsCommandList>& _CommandList)
 {
 	//파이프라인에 그래픽스 상태 객체를 설정한다. 
-	pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[0]);
+	_CommandList->SetPipelineState(m_pd3dPipelineStates.Get());
 }
-void CShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CShader::Render(const ComPtr<ID3D12GraphicsCommandList>& _CommandList, CCamera* pCamera)
 {
-	OnPrepareRender(pd3dCommandList);
+	OnPrepareRender(_CommandList);
 }
 
-void CShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
-	* pd3dCommandList)
+void CShader::CreateShaderVariables(const ComPtr<ID3D12Device>& _Device, const ComPtr<ID3D12GraphicsCommandList>& _CommandList)
 {
 }
-void CShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+void CShader::UpdateShaderVariables(const ComPtr<ID3D12GraphicsCommandList>& _CommandList)
 {
 }
-void CShader::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4
+void CShader::UpdateShaderVariable(const ComPtr<ID3D12GraphicsCommandList>& _CommandList, XMFLOAT4X4
 	* pxmf4x4World)
 {
 	XMFLOAT4X4 xmf4x4World;
 	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(pxmf4x4World)));
-	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+	_CommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
 }
 void CShader::ReleaseShaderVariables()
 {
@@ -196,21 +176,8 @@ D3D12_INPUT_LAYOUT_DESC CDiffusedShader::CreateInputLayout()
 }
 
 
-D3D12_SHADER_BYTECODE CDiffusedShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
-{
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSDiffused", "vs_5_1",
-		ppd3dShaderBlob));
-}
-D3D12_SHADER_BYTECODE CDiffusedShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
-{
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSDiffused", "ps_5_1",
-		ppd3dShaderBlob));
-}
 
-void CDiffusedShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature
-	* pd3dGraphicsRootSignature)
+void CDiffusedShader::CreateShader(const wstring& shaderFile, const string& vs, const string& ps, const ComPtr<ID3D12Device>& _Device, const ComPtr<ID3D12RootSignature>& _RootSignature)
 {
-	m_nPipelineStates = 1;
-	m_ppd3dPipelineStates = new ID3D12PipelineState * [m_nPipelineStates];
-	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	CShader::CreateShader(shaderFile, vs, ps,_Device, _RootSignature);
 }

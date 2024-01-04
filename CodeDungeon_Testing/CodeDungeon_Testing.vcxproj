@@ -133,6 +133,9 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CodeDungeon_Testing.h" />
+    <ClInclude Include="CommandQueue.h" />
+    <ClInclude Include="d3d12.h" />
+    <ClInclude Include="DeviceAndFactory.h" />
     <ClInclude Include="GameFramework.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Mesh.h" />
@@ -140,18 +143,22 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SwapChainAndRtvDsvHeap.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CodeDungeon_Testing.cpp" />
+    <ClCompile Include="CommandQueue.cpp" />
+    <ClCompile Include="DeviceAndFactory.cpp" />
     <ClCompile Include="GameFramework.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="SwapChainAndRtvDsvHeap.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>

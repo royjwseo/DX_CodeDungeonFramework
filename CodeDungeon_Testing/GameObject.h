@@ -28,7 +28,7 @@ public:
 	virtual void SetShader(CShader* pShader);
 	virtual void Animate(float fTimeElapsed);
 	virtual void OnPrepareRender();
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void Render(const ComPtr<ID3D12GraphicsCommandList>& _CommandList, CCamera* pCamera);
 
 };
 

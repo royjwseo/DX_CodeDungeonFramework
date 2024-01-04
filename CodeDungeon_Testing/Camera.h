@@ -24,9 +24,9 @@ public:
 	CCamera();
 	virtual ~CCamera();
 
-	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void CreateShaderVariables(const ComPtr<ID3D12Device>& _Device, const ComPtr<ID3D12GraphicsCommandList>& _CommandList);
 	virtual void ReleaseShaderVariables();
-	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(const ComPtr<ID3D12GraphicsCommandList>& _CommandList);
 
 	void GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Look, XMFLOAT3 xmf3Up);
 	void GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle);
@@ -34,7 +34,7 @@ public:
 	void SetViewport(int xTopLeft, int yTopLeft, int nWidth, int nHeight, float fMinZ = 0.0f, float fMaxZ = 1.0f);
 	void SetScissorRect(LONG xLeft, LONG yTop, LONG xRight, LONG yBottom);
 
-	virtual void SetViewportsAndScissorRects(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void SetViewportsAndScissorRects(const ComPtr<ID3D12GraphicsCommandList>& _CommandList);
 
 };
 

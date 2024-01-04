@@ -40,26 +40,25 @@ void CCamera::GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMF
 {
 	m_xmf4x4View = Matrix4x4::LookAtLH(xmf3Position, xmf3LookAt, xmf3Up);
 }
-void CCamera::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
-	* pd3dCommandList)
+void CCamera::CreateShaderVariables(const ComPtr<ID3D12Device>& _Device, const ComPtr<ID3D12GraphicsCommandList>& _CommandList)
 {
 }
-void CCamera::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+void CCamera::UpdateShaderVariables(const ComPtr<ID3D12GraphicsCommandList>& _CommandList)
 {
 	XMFLOAT4X4 xmf4x4View;
 	XMStoreFloat4x4(&xmf4x4View, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4View)));
 	//루트 파라메터 인덱스 1의
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4View, 0);
+	_CommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4View, 0);
 	XMFLOAT4X4 xmf4x4Projection;
 	XMStoreFloat4x4(&xmf4x4Projection,
 		XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Projection)));
-	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4Projection, 16);
+	_CommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4Projection, 16);
 }
 void CCamera::ReleaseShaderVariables()
 {
 }
-void CCamera::SetViewportsAndScissorRects(ID3D12GraphicsCommandList* pd3dCommandList)
+void CCamera::SetViewportsAndScissorRects(const ComPtr<ID3D12GraphicsCommandList>& _CommandList)
 {
-	pd3dCommandList->RSSetViewports(1, &m_d3dViewport);
-	pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect);
+	_CommandList->RSSetViewports(1, &m_d3dViewport);
+	_CommandList->RSSetScissorRects(1, &m_d3dScissorRect);
 }

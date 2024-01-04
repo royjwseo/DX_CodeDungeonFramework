@@ -24,27 +24,26 @@ bool CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 
 
 
-void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
-	* pd3dCommandList)
+void CScene::BuildObjects(const ComPtr<ID3D12Device>& _Device, const ComPtr<ID3D12GraphicsCommandList>& _CommandList)
 {
-	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(_Device);
 	//가로x세로x깊이가 12x12x12인 정육면체 메쉬를 생성한다. 
-	CCubeMeshDiffused* pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList,
+	CCubeMeshDiffused* pCubeMesh = new CCubeMeshDiffused(_Device, _CommandList,
 		12.0f, 12.0f, 12.0f);
 	m_nObjects = 1;
 	m_ppObjects = new CGameObject * [m_nObjects];
 	CRotatingObject* pRotatingObject = new CRotatingObject();
 	pRotatingObject->SetMesh(pCubeMesh);
 	CDiffusedShader* pShader = new CDiffusedShader();
-	pShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	pShader->CreateShader(L"Shaders.hlsl","VSDiffused","PSDiffused",_Device, m_pd3dGraphicsRootSignature);
+	pShader->CreateShaderVariables(_Device, _CommandList);
 	pRotatingObject->SetShader(pShader);
 	m_ppObjects[0] = pRotatingObject;
 }
 
 void CScene::ReleaseObjects()
 {
-	if (m_pd3dGraphicsRootSignature) m_pd3dGraphicsRootSignature->Release();
+	
 	if (m_ppObjects)
 	{
 		for (int j = 0; j < m_nObjects; j++) if (m_ppObjects[j]) delete m_ppObjects[j];
@@ -61,15 +60,15 @@ void CScene::ReleaseUploadBuffers()
 	}
 }
 
-ID3D12RootSignature* CScene::GetGraphicsRootSignature()
+ComPtr<ID3D12RootSignature> CScene::GetGraphicsRootSignature()
 {
 	return(m_pd3dGraphicsRootSignature);
 }
 
 
-ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
+ComPtr<ID3D12RootSignature> CScene::CreateGraphicsRootSignature(const ComPtr<ID3D12Device>& _Device)
 {
-	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
+	ComPtr<ID3D12RootSignature> pd3dGraphicsRootSignature = NULL;
 	D3D12_ROOT_PARAMETER pd3dRootParameters[2];
 	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
 	pd3dRootParameters[0].Constants.Num32BitValues = 16;
@@ -94,15 +93,13 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	d3dRootSignatureDesc.NumStaticSamplers = 0;
 	d3dRootSignatureDesc.pStaticSamplers = NULL;
 	d3dRootSignatureDesc.Flags = d3dRootSignatureFlags;
-	ID3DBlob* pd3dSignatureBlob = NULL;
-	ID3DBlob* pd3dErrorBlob = NULL;
+	ComPtr<ID3DBlob> pd3dSignatureBlob, pd3dErrorBlob;
+	
 	::D3D12SerializeRootSignature(&d3dRootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1,
 		&pd3dSignatureBlob, &pd3dErrorBlob);
-	pd3dDevice->CreateRootSignature(0, pd3dSignatureBlob->GetBufferPointer(),
-		pd3dSignatureBlob->GetBufferSize(), __uuidof(ID3D12RootSignature), (void
-			**)&pd3dGraphicsRootSignature);
-	if (pd3dSignatureBlob) pd3dSignatureBlob->Release();
-	if (pd3dErrorBlob) pd3dErrorBlob->Release();
+	_Device->CreateRootSignature(0, pd3dSignatureBlob->GetBufferPointer(),
+		pd3dSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&pd3dGraphicsRootSignature));
+	
 	return(pd3dGraphicsRootSignature);
 }
 
@@ -115,15 +112,15 @@ void CScene::AnimateObjects(float fTimeElapsed)
 }
 
 
-void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CScene::Render(const ComPtr<ID3D12GraphicsCommandList>& _CommandList, CCamera* pCamera)
 {
-	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
-	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
-	if (pCamera) pCamera->UpdateShaderVariables(pd3dCommandList);
+	pCamera->SetViewportsAndScissorRects(_CommandList);
+	_CommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature.Get());
+	if (pCamera) pCamera->UpdateShaderVariables(_CommandList);
 	//씬을 렌더링하는 것은 씬을 구성하는 게임 객체(셰이더를 포함하는 객체)들을 렌더링하는 것이다.
 	for (int j = 0; j < m_nObjects; j++)
 	{
-		if (m_ppObjects[j]) m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		if (m_ppObjects[j]) m_ppObjects[j]->Render(_CommandList, pCamera);
 	}
 }
 

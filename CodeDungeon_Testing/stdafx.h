@@ -19,9 +19,12 @@ enum
 	SWAP_CHAIN_BUFFER_COUNT = 2
 };
 
-#pragma comment(lib, "d3dcompiler.lib")
-#pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "dwrite.lib")
+#pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
 
 #include <tchar.h>
@@ -52,20 +55,61 @@ using namespace std;
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
-
+#include <dxgi1_6.h>
+#include <dwrite.h>
+#include <d2d1_3.h>
+#include <d3d11on12.h>
+#include <d3d12sdklayers.h>
+#include <d3dcompiler.h>
 #include <DirectXCollision.h>
 #include <DXGIDebug.h>
+#include "d3d12.h"
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 using Microsoft::WRL::ComPtr;
 
 #define RANDOM_COLOR XMFLOAT4(rand() / float(RAND_MAX), rand() / float(RAND_MAX), rand() / float(RAND_MAX), rand() / float(RAND_MAX))
 
-extern ID3D12Resource* CreateBufferResource(ID3D12Device* pd3dDevice,
-	ID3D12GraphicsCommandList* pd3dCommandList, void* pData, UINT nBytes, D3D12_HEAP_TYPE
+extern ComPtr<ID3D12Resource> CreateBufferResource(const ComPtr<ID3D12Device>& _Device,
+	const ComPtr<ID3D12GraphicsCommandList>& _CommandList, void* pData, UINT nBytes, D3D12_HEAP_TYPE
 	d3dHeapType = D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATES d3dResourceStates =
 	D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, ID3D12Resource** ppd3dUploadBuffer =
 	NULL);
+
+extern 	ComPtr<ID3D12Resource> CreateBufferResource(const ComPtr<ID3D12Device>& device, const ComPtr<ID3D12GraphicsCommandList>& commandList,
+	const void* data, UINT sizePerData, UINT dataCount, D3D12_HEAP_TYPE heapType, D3D12_RESOURCE_STATES resourceState, ID3D12Resource** uploadBuffer = nullptr);
+
+namespace DX
+{
+	// Helper class for COM exceptions
+	class com_exception : public std::exception
+	{
+	public:
+		com_exception(HRESULT hr) : result(hr) {}
+
+		const char* what() const override
+		{
+			static char s_str[64] = {};
+			sprintf_s(s_str, "Failure with HRESULT of %08X",
+				static_cast<unsigned int>(result));
+			return s_str;
+		}
+
+	private:
+		HRESULT result;
+	};
+
+	// Helper utility converts D3D API failures into exceptions.
+	inline void ThrowIfFailed(HRESULT hr)
+	{
+		if (FAILED(hr))
+		{
+			throw com_exception(hr);
+		}
+	}
+}
+
+
 
 namespace Vector3
 {

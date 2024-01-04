@@ -40,16 +40,16 @@ void CGameObject::OnPrepareRender()
 {
 }
 
-void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CGameObject::Render(const ComPtr<ID3D12GraphicsCommandList>& _CommandList, CCamera* pCamera)
 {
 	OnPrepareRender();
 	if (m_pShader)
 	{
 		//게임 객체의 월드 변환 행렬을 셰이더의 상수 버퍼로 전달(복사)한다.
-		m_pShader->UpdateShaderVariable(pd3dCommandList, &m_xmf4x4World);
-		m_pShader->Render(pd3dCommandList, pCamera);
+		m_pShader->UpdateShaderVariable(_CommandList, &m_xmf4x4World);
+		m_pShader->Render(_CommandList, pCamera);
 	}
-	if (m_pMesh) m_pMesh->Render(pd3dCommandList);
+	if (m_pMesh) m_pMesh->Render(_CommandList);
 }
 
 void CGameObject::Rotate(XMFLOAT3* pxmf3Axis, float fAngle)
