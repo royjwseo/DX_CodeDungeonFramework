@@ -1,12 +1,12 @@
 #pragma once
 class SwapChainAndRtvDsvHeap {
 public:
-	void InitSwapChainAndRtvDsvHeap(ComPtr<IDXGIFactory4>& _Factory, ComPtr<ID3D12Device>& _Device, ComPtr< ID3D12CommandQueue>& _CmdQueue, bool MsaaEnable, uint16 MsaaQualityLevels);
-	void ChangeSwapChainState(ComPtr<ID3D12Device>& _Device);
-	void CreateSwapChain(ComPtr<IDXGIFactory4>& _Factory, ComPtr<ID3D12Device>& _Device, ComPtr< ID3D12CommandQueue>& _CmdQueue, bool MssaaEnable, uint16 MsaaQualityLevels); //스왑 체인 생성 함수
-	void CreateRenderTargetViews(ComPtr<ID3D12Device>& _Device); //렌더 타겟 뷰 생성 함수
-	void CreateDepthStencilView(ComPtr<ID3D12Device>& _Device, bool MsaaEnable, uint16 MsaaQualityLevels); //깊이-스텐실 뷰 생성 함수
-	void CreateRtvAndDsvDescriptorHeaps(ComPtr<ID3D12Device>& _Device); //서술자 힙 생성 함수
+	void InitSwapChainAndRtvDsvHeap(const ComPtr<IDXGIFactory4>& _Factory, const ComPtr<ID3D12Device>& _Device, const ComPtr< ID3D12CommandQueue>& _CmdQueue, bool MsaaEnable, uint16 MsaaQualityLevels);
+	void ChangeSwapChainState(const ComPtr<ID3D12Device>& _Device);
+	void CreateSwapChain(const ComPtr<IDXGIFactory4>& _Factory, const ComPtr<ID3D12Device>& _Device, const ComPtr< ID3D12CommandQueue>& _CmdQueue, bool MssaaEnable, uint16 MsaaQualityLevels); //스왑 체인 생성 함수
+	void CreateRenderTargetViews(const ComPtr<ID3D12Device>& _Device); //렌더 타겟 뷰 생성 함수
+	void CreateDepthStencilView(const ComPtr<ID3D12Device>& _Device, bool MsaaEnable, uint16 MsaaQualityLevels); //깊이-스텐실 뷰 생성 함수
+	void CreateRtvAndDsvDescriptorHeaps(const ComPtr<ID3D12Device>& _Device); //서술자 힙 생성 함수
 public:
 	ComPtr<IDXGISwapChain3>GetSwapChain() { return m_cpdxgiSwapChain; }
 	ComPtr<ID3D12Resource>GetRenderTarget(int index) { return m_ppd3dRenderTargetBuffers[index]; }
@@ -37,7 +37,6 @@ private:
 public:
 	HINSTANCE m_hInstance;
 	HWND m_hWnd;
-
 	int m_nWndClientWidth; //swap chain 너비 등 저장목적
 	int m_nWndClientHeight;
 };

@@ -51,7 +51,7 @@ CTriangleMesh::CTriangleMesh(const ComPtr<ID3D12Device>& _Device, const ComPtr<I
 		1.0f));
 	pVertices[2] = CDiffusedVertex(XMFLOAT3(-0.5f, -0.5f, 0.0f), XMFLOAT4(Colors::Blue));
 	//삼각형 메쉬를 리소스(정점 버퍼)로 생성한다. 
-	m_pd3dVertexBuffer = ::CreateBufferResource(_Device, _CommandList, pVertices, m_nStride* m_nVertices, D3D12_HEAP_TYPE_DEFAULT,
+	m_pd3dVertexBuffer = Util::CreateBufferResource(_Device, _CommandList, pVertices, m_nStride* m_nVertices, D3D12_HEAP_TYPE_DEFAULT,
 		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, & m_pd3dVertexUploadBuffer);
 		//정점 버퍼 뷰를 생성한다. 
 		m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
@@ -79,7 +79,7 @@ CCubeMeshDiffused::CCubeMeshDiffused(const ComPtr<ID3D12Device>& _Device, const 
 	pVertices[5] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), RANDOM_COLOR);
 	pVertices[6] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), RANDOM_COLOR);
 	pVertices[7] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), RANDOM_COLOR);
-	m_pd3dVertexBuffer = ::CreateBufferResource(_Device, _CommandList, pVertices,
+	m_pd3dVertexBuffer = Util::CreateBufferResource(_Device, _CommandList, pVertices,
 		m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT,
 		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
 	m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
@@ -115,7 +115,7 @@ CCubeMeshDiffused::CCubeMeshDiffused(const ComPtr<ID3D12Device>& _Device, const 
 	//ⓛ 옆면(Right) 사각형의 아래쪽 삼각형
 	pnIndices[33] = 7; pnIndices[34] = 4; pnIndices[35] = 6;
 	//인덱스 버퍼를 생성한다.
-	m_pd3dIndexBuffer = ::CreateBufferResource(_Device, _CommandList, pnIndices,
+	m_pd3dIndexBuffer = Util::CreateBufferResource(_Device, _CommandList, pnIndices,
 	sizeof(UINT)* m_nIndices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER,
 		& m_pd3dIndexUploadBuffer);
 		//인덱스 버퍼 뷰를 생성한다. 

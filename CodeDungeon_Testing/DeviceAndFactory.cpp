@@ -55,11 +55,7 @@ void DeviceAndFactory::CreateDirect3DDevice()
 	m_bMsaa4xEnable = (m_nMsaa4xQualityLevels > 1) ? true : false;
 	//다중 샘플의 품질 수준이 1보다 크면 다중 샘플링을 활성화한다. 
 
-	DX::ThrowIfFailed(m_cpd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_cpd3dFence)));
-
-	//펜스를 생성하고 펜스 값을 0으로 설정한다
-
-	m_hFenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+	
 
 
 

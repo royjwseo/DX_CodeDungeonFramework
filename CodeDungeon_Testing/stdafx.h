@@ -36,7 +36,7 @@ enum
 #include <map>
 using namespace std;
 
-#include "targetver.h"
+
 #define WIN32_LEAN_AND_MEAN             // 거의 사용되지 않는 내용을 Windows 헤더에서 제외합니다.
 // Windows 헤더 파일
 #include <windows.h>
@@ -63,21 +63,39 @@ using namespace std;
 #include <d3dcompiler.h>
 #include <DirectXCollision.h>
 #include <DXGIDebug.h>
-#include "d3d12.h"
+#include "d3dx12.h"
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 using Microsoft::WRL::ComPtr;
 
+
+#define DEVICE gGameFrameWork->GetDeviceAndFactory()->GetDevice()
+#define CMDLIST gGameFrameWork->GetCommandQueue()->GetCmdList()
+#define GRAPHICS_ROOT_SIGNATURE		gGameFrameWork->GetRootSignature()->GetGraphicsRootSignature()
+
+
+extern unique_ptr<class Engine> gGameFrameWork;
+
+
+
+
 #define RANDOM_COLOR XMFLOAT4(rand() / float(RAND_MAX), rand() / float(RAND_MAX), rand() / float(RAND_MAX), rand() / float(RAND_MAX))
 
-extern ComPtr<ID3D12Resource> CreateBufferResource(const ComPtr<ID3D12Device>& _Device,
-	const ComPtr<ID3D12GraphicsCommandList>& _CommandList, void* pData, UINT nBytes, D3D12_HEAP_TYPE
-	d3dHeapType = D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATES d3dResourceStates =
-	D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, ID3D12Resource** ppd3dUploadBuffer =
-	NULL);
+namespace Util {
+	extern ComPtr<ID3D12Resource> CreateBufferResource(const ComPtr<ID3D12Device>& _Device,
+		const ComPtr<ID3D12GraphicsCommandList>& _CommandList, void* pData, UINT nBytes, D3D12_HEAP_TYPE
+		d3dHeapType = D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATES d3dResourceStates =
+		D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, ID3D12Resource** ppd3dUploadBuffer =
+		NULL);
 
-extern 	ComPtr<ID3D12Resource> CreateBufferResource(const ComPtr<ID3D12Device>& device, const ComPtr<ID3D12GraphicsCommandList>& commandList,
-	const void* data, UINT sizePerData, UINT dataCount, D3D12_HEAP_TYPE heapType, D3D12_RESOURCE_STATES resourceState, ID3D12Resource** uploadBuffer = nullptr);
+	/*extern 	ComPtr<ID3D12Resource> CreateBufferResource(const ComPtr<ID3D12Device>& device, const ComPtr<ID3D12GraphicsCommandList>& commandList,
+		const void* data, UINT sizePerData, UINT dataCount, D3D12_HEAP_TYPE heapType, D3D12_RESOURCE_STATES resourceState, ID3D12Resource** uploadBuffer = nullptr);*/
+
+	extern void SynchronizeResourceTransition(const ComPtr<ID3D12GraphicsCommandList>& _CommandList, ComPtr<ID3D12Resource> pd3dResource, D3D12_RESOURCE_STATES d3dStateBefore, D3D12_RESOURCE_STATES d3dStateAfter);
+	extern void ExecuteCommandList(const ComPtr<ID3D12GraphicsCommandList>& _CommandList, const ComPtr<ID3D12CommandQueue>& _CmdQueue, const ComPtr<ID3D12Fence>& _Fence, UINT64 nFenceValue, HANDLE hFenceEvent);
+	extern void WaitForGpuComplete(const ComPtr<ID3D12CommandQueue>& _CmdQueue, const ComPtr<ID3D12Fence>& _Fence, UINT64 nFenceValue, HANDLE hFenceEvent);
+}
+
 
 namespace DX
 {

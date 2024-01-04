@@ -1,4 +1,3 @@
-#pragma once
 //*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.

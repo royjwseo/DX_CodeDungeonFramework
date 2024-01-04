@@ -1,126 +1,124 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="리소스 파일">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="소스 파일\DXEngine">
-      <UniqueIdentifier>{493f2ba8-c31c-4266-aea0-098dec2e73fe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Scene">
-      <UniqueIdentifier>{5f0e2f0c-a08f-4caa-aa1f-ff56ea3769b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Camera">
-      <UniqueIdentifier>{b0afcfe3-9b4b-4ded-9f6c-e1657797e0f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Game">
-      <UniqueIdentifier>{54821345-432a-4629-af1c-94a94117d7ac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Objects">
-      <UniqueIdentifier>{f34a6a6d-998d-4915-b9df-ff7238dd5266}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Shader">
-      <UniqueIdentifier>{bba51671-2ccb-4e3e-9df8-9a5df6630789}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Timer">
-      <UniqueIdentifier>{092e369a-fbc0-4636-ae33-3936bb23ed6b}</UniqueIdentifier>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{f5662ff9-f9c0-4914-87ff-2896908631f8}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\Utils">
       <UniqueIdentifier>{c9bdce31-1df9-46d4-b299-728faedc3418}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Client">
+      <UniqueIdentifier>{e732d8b2-86e5-4b3d-b3f1-73deb610c9f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Engine">
+      <UniqueIdentifier>{14892580-7e8b-4051-b3bf-263dcfd401c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Others">
+      <UniqueIdentifier>{37cde52e-558b-4304-863a-904e371c1175}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Camera">
+      <UniqueIdentifier>{30a4beb2-32db-418f-84f1-0b57cfd817cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Scene">
+      <UniqueIdentifier>{0cb00087-f7e3-4ebf-92b5-afb49275b563}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Components">
+      <UniqueIdentifier>{34497277-7f79-446f-ab1f-d4289e3b23f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="targetver.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GameFramework.h">
-      <Filter>소스 파일\DXEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="DeviceAndFactory.h">
-      <Filter>소스 파일\DXEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="SwapChainAndRtvDsvHeap.h">
-      <Filter>소스 파일\DXEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandQueue.h">
-      <Filter>소스 파일\DXEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>소스 파일\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>소스 파일\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>소스 파일\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>소스 파일\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="d3d12.h">
-      <Filter>소스 파일\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>소스 파일\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeDungeon_Testing.h">
+      <Filter>소스 파일\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>소스 파일\Others</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>소스 파일\Others</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandQueue.h">
+      <Filter>소스 파일\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceAndFactory.h">
+      <Filter>소스 파일\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>소스 파일\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="SwapChainAndRtvDsvHeap.h">
+      <Filter>소스 파일\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>소스 파일\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>소스 파일\Timer</Filter>
+    <ClInclude Include="GameObject.h">
+      <Filter>소스 파일\Components</Filter>
     </ClInclude>
-    <ClInclude Include="CodeDungeon_Testing.h">
-      <Filter>소스 파일\Game</Filter>
+    <ClInclude Include="Mesh.h">
+      <Filter>소스 파일\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="RootSignature.h">
+      <Filter>소스 파일\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>소스 파일\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12.h">
+      <Filter>소스 파일\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>소스 파일\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>소스 파일\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameFramework.cpp">
-      <Filter>소스 파일\DXEngine</Filter>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="DeviceAndFactory.cpp">
-      <Filter>소스 파일\DXEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="SwapChainAndRtvDsvHeap.cpp">
-      <Filter>소스 파일\DXEngine</Filter>
+    <ClCompile Include="CodeDungeon_Testing.cpp">
+      <Filter>소스 파일\Client</Filter>
     </ClCompile>
     <ClCompile Include="CommandQueue.cpp">
-      <Filter>소스 파일\DXEngine</Filter>
+      <Filter>소스 파일\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>소스 파일\Scene</Filter>
+    <ClCompile Include="DeviceAndFactory.cpp">
+      <Filter>소스 파일\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>소스 파일\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="SwapChainAndRtvDsvHeap.cpp">
+      <Filter>소스 파일\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>소스 파일\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="CodeDungeon_Testing.cpp">
-      <Filter>소스 파일\Game</Filter>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>소스 파일\Components</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
-      <Filter>소스 파일\Objects</Filter>
+      <Filter>소스 파일\Components</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>소스 파일\Objects</Filter>
+    <ClCompile Include="RootSignature.cpp">
+      <Filter>소스 파일\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>소스 파일\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
-      <Filter>소스 파일\Shader</Filter>
+      <Filter>소스 파일\Components</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
-      <Filter>소스 파일\Timer</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>소스 파일\Utils</Filter>
+      <Filter>소스 파일\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

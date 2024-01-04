@@ -2,7 +2,7 @@
 #include "SwapChainAndRtvDsvHeap.h"
 
 //---------------------------
-void SwapChainAndRtvDsvHeap::InitSwapChainAndRtvDsvHeap(ComPtr<IDXGIFactory4>& _Factory, ComPtr<ID3D12Device>& _Device, ComPtr< ID3D12CommandQueue>& _CmdQueue, bool MsaaEnable, uint16 MsaaQualityLevels)
+void SwapChainAndRtvDsvHeap::InitSwapChainAndRtvDsvHeap(const ComPtr<IDXGIFactory4>& _Factory,const ComPtr<ID3D12Device>& _Device,const ComPtr< ID3D12CommandQueue>& _CmdQueue, bool MsaaEnable, uint16 MsaaQualityLevels)
 {
 	m_nRtvDescriptorIncrementSize = 0;
 	m_nDsvDescriptorIncrementSize = 0;
@@ -20,7 +20,7 @@ void SwapChainAndRtvDsvHeap::InitSwapChainAndRtvDsvHeap(ComPtr<IDXGIFactory4>& _
 
 }
 
-void SwapChainAndRtvDsvHeap::ChangeSwapChainState(ComPtr<ID3D12Device>& _Device)
+void SwapChainAndRtvDsvHeap::ChangeSwapChainState(const ComPtr<ID3D12Device>& _Device)
 {
 
 	BOOL bFullScreenState = FALSE;
@@ -34,6 +34,7 @@ void SwapChainAndRtvDsvHeap::ChangeSwapChainState(ComPtr<ID3D12Device>& _Device)
 	dxgiTargetParameters.RefreshRate.Denominator = 1;
 	dxgiTargetParameters.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	dxgiTargetParameters.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+
 	m_cpdxgiSwapChain->ResizeTarget(&dxgiTargetParameters);
 	for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++) if (m_ppd3dRenderTargetBuffers[i])
 		m_ppd3dRenderTargetBuffers[i]->Release();
@@ -47,7 +48,7 @@ void SwapChainAndRtvDsvHeap::ChangeSwapChainState(ComPtr<ID3D12Device>& _Device)
 }
 
 
-void SwapChainAndRtvDsvHeap::CreateRenderTargetViews(ComPtr<ID3D12Device>& _Device)
+void SwapChainAndRtvDsvHeap::CreateRenderTargetViews(const ComPtr<ID3D12Device>& _Device)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle =
 		m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -61,7 +62,7 @@ void SwapChainAndRtvDsvHeap::CreateRenderTargetViews(ComPtr<ID3D12Device>& _Devi
 
 }
 
-void SwapChainAndRtvDsvHeap::CreateDepthStencilView(ComPtr<ID3D12Device>& _Device, bool MssaaEnable, uint16 MsaaQualityLevels)
+void SwapChainAndRtvDsvHeap::CreateDepthStencilView(const ComPtr<ID3D12Device>& _Device, bool MssaaEnable, uint16 MsaaQualityLevels)
 {
 	D3D12_RESOURCE_DESC d3dResourceDesc;
 	d3dResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -107,7 +108,7 @@ void SwapChainAndRtvDsvHeap::CreateDepthStencilView(ComPtr<ID3D12Device>& _Devic
 }
 
 //->여기 개념부터 보고 작성
-void SwapChainAndRtvDsvHeap::CreateRtvAndDsvDescriptorHeaps(ComPtr<ID3D12Device>& _Device) {
+void SwapChainAndRtvDsvHeap::CreateRtvAndDsvDescriptorHeaps(const ComPtr<ID3D12Device>& _Device) {
 
 	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
 	::ZeroMemory(&d3dDescriptorHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
@@ -128,7 +129,7 @@ void SwapChainAndRtvDsvHeap::CreateRtvAndDsvDescriptorHeaps(ComPtr<ID3D12Device>
 }
 
 
-void SwapChainAndRtvDsvHeap::CreateSwapChain(ComPtr<IDXGIFactory4>& _Factory, ComPtr<ID3D12Device>& _Device, ComPtr< ID3D12CommandQueue>& _CmdQueue, bool MssaaEnable, uint16 MsaaQualityLevels)
+void SwapChainAndRtvDsvHeap::CreateSwapChain(const ComPtr<IDXGIFactory4>& _Factory, const ComPtr<ID3D12Device>& _Device, const ComPtr< ID3D12CommandQueue>& _CmdQueue, bool MssaaEnable, uint16 MsaaQualityLevels)
 {
 	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
 	::ZeroMemory(&dxgiSwapChainDesc, sizeof(dxgiSwapChainDesc));
