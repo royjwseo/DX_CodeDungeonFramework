@@ -2,12 +2,12 @@
 #include "Engine.h"
 
 
+
+
 bool Engine::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 {
-	m_spDevice = make_shared<DeviceAndFactory>();
-	m_spSwapChainAndRtvDsvHeap = make_shared<SwapChainAndRtvDsvHeap>();
-	m_spCommandQueue = make_shared<CommandQueue>();
-	m_spRootSignature = make_shared<RootSignature>();
+
+	
 
 	for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++)m_spCommandQueue->m_nFenceValues[i] = 0;
 	m_pScene = NULL;
@@ -17,11 +17,13 @@ bool Engine::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	m_spSwapChainAndRtvDsvHeap->m_hInstance = hInstance;
 	m_spSwapChainAndRtvDsvHeap->m_hWnd = hMainWnd;
 	m_spDevice->InitDeviceAndFactory();
+
 	m_spCommandQueue->CreateCommandQueueAndList(m_spDevice->GetDevice(), m_spSwapChainAndRtvDsvHeap);
 	m_spSwapChainAndRtvDsvHeap->InitSwapChainAndRtvDsvHeap(m_spDevice->GetFactory(), m_spDevice->GetDevice(), m_spCommandQueue->GetCmdQueue(), m_spDevice->GetMsaa4xEnable(), m_spDevice->GetMsaa4xQualityLevels());
 	m_spRootSignature->InitRootSignature(m_spDevice->GetDevice());
 
 	BuildObjects();
+
 	return(true);
 }
 
@@ -31,14 +33,7 @@ void Engine::OnDestroy()
 
 	m_spSwapChainAndRtvDsvHeap->GetSwapChain()->SetFullscreenState(FALSE, NULL);
 
-#if defined(_DEBUG)
-	ComPtr<IDXGIDebug1> pdxgiDebug = nullptr;
 
-	DXGIGetDebugInterface1(0, IID_PPV_ARGS(&pdxgiDebug));
-	HRESULT hResult = pdxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL,
-		DXGI_DEBUG_RLO_DETAIL);
-
-#endif
 }
 
 
@@ -94,7 +89,7 @@ void Engine::Render() {
 	AnimateObjects();
 
 	RenderBegin();
-	//GetCommandQueue()->GetCmdList()->SetGraphicsRootSignature(m_spRootSignature->GetGraphicsRootSignature().Get());
+
 	if (m_pScene)m_pScene->Render(m_spCommandQueue->GetCmdList().Get(), m_pCamera);
 	
 	//TODO
@@ -158,8 +153,8 @@ LRESULT CALLBACK Engine::OnProcessingWindowMessage(HWND hWnd, UINT nMessageID,
 	{
 	case WM_SIZE:
 	{
-		m_spSwapChainAndRtvDsvHeap->m_nWndClientWidth = LOWORD(lParam);
-		m_spSwapChainAndRtvDsvHeap->m_nWndClientHeight = HIWORD(lParam);
+		/*m_spSwapChainAndRtvDsvHeap->m_nWndClientWidth = LOWORD(lParam);
+		m_spSwapChainAndRtvDsvHeap->m_nWndClientHeight = HIWORD(lParam);*/
 		break;
 	}
 	case WM_LBUTTONDOWN:

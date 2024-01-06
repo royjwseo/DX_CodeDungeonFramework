@@ -21,7 +21,7 @@ private:
 	uint16 m_nMsaa4xQualityLevels = 0;
 
 	ComPtr<ID3D12Device> m_cpd3dDevice;
-
+	ComPtr<ID3D12Debug>			m_pd3dDebugController;
 
 
 };

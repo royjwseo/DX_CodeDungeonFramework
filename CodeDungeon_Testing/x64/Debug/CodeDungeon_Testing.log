@@ -1,15 +1,8 @@
-﻿  Camera.cpp
-  CodeDungeon_Testing.cpp
+﻿  CodeDungeon_Testing.cpp
   CommandQueue.cpp
-  DeviceAndFactory.cpp
   Engine.cpp
-  GameObject.cpp
-  Mesh.cpp
   RootSignature.cpp
   Scene.cpp
-  Shader.cpp
-  SwapChainAndRtvDsvHeap.cpp
-  Timer.cpp
   stdafx.cpp
   코드를 생성하고 있습니다...
   CodeDungeon_Testing.vcxproj -> C:\Users\서정원\Desktop\졸업작품\x64\Debug\CodeDungeon_Testing.exe

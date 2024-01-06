@@ -8,6 +8,7 @@
 #include "RootSignature.h"
 class Engine
 {
+	
 public:
 	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
 	void OnDestroy();
@@ -34,11 +35,12 @@ private:
 	CScene* m_pScene;
 	ComPtr<ID3D12PipelineState> m_pd3dPipelineState;
 	
+
 private:
-	shared_ptr<DeviceAndFactory> m_spDevice;
-	shared_ptr<SwapChainAndRtvDsvHeap> m_spSwapChainAndRtvDsvHeap;
-	shared_ptr<CommandQueue> m_spCommandQueue;
-	shared_ptr<RootSignature> m_spRootSignature;
+	shared_ptr<DeviceAndFactory> m_spDevice= make_shared<DeviceAndFactory>();
+	shared_ptr<SwapChainAndRtvDsvHeap> m_spSwapChainAndRtvDsvHeap= make_shared<SwapChainAndRtvDsvHeap>();
+	shared_ptr<CommandQueue> m_spCommandQueue = make_shared<CommandQueue>();
+	shared_ptr<RootSignature> m_spRootSignature = make_shared<RootSignature>();
 public:
 	//INPUT ฐüทร
 	void OnProcessingMouseMessage(HWND hwnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);

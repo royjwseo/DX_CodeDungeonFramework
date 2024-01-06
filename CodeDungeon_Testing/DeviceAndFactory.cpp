@@ -3,6 +3,7 @@
 
 void DeviceAndFactory::InitDeviceAndFactory()
 {
+
 	CreateDxgiFactory();
 	CreateDirect3DDevice();
 }
@@ -12,10 +13,9 @@ void DeviceAndFactory::CreateDxgiFactory()
 	UINT nDXGIFactoryFlags = 0;
 #if defined(_DEBUG) //전처리기 조건문 #if있으면 #endif 는 무조건 세트, D3D12 디버그층 활성화
 
-	ComPtr<ID3D12Debug> debugController;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&m_pd3dDebugController))))
 	{
-		debugController->EnableDebugLayer();
+		m_pd3dDebugController->EnableDebugLayer();
 		nDXGIFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 	}
 #endif

@@ -4,7 +4,7 @@
 #include "Engine.h"
 
 #define MAX_LOADSTRING 100
-
+HWND hMainWnd;
 HINSTANCE hInst;                                // 현재 인스턴스입니다. 인스턴스 = 프로그램의 정보
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
@@ -37,12 +37,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, //응용 프로그램 시작 진
     {
         return FALSE;
     }
+    gGameFrameWork->OnCreate(hInstance, hMainWnd);
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CODEDUNGEONTESTING));
 
     MSG msg;
 
-
+    
 
     while (1)
     {
@@ -113,12 +114,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     RECT rc = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT };
     DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_BORDER | WS_SYSMENU;
     AdjustWindowRect(&rc, dwStyle, FALSE);
-    HWND hMainWnd = CreateWindow(szWindowClass, szTitle, dwStyle, CW_USEDEFAULT,
+    hMainWnd = CreateWindow(szWindowClass, szTitle, dwStyle, CW_USEDEFAULT,
         CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, hInstance, NULL);
     if (!hMainWnd) return(FALSE);
-    gGameFrameWork->OnCreate(hInstance, hMainWnd);
+   
+    
     ::ShowWindow(hMainWnd, nCmdShow);
     ::UpdateWindow(hMainWnd);
+  
 #ifdef _WITH_SWAPCHAIN_FULLSCREEN_STATE
     gGameFramework.ChangeSwapChainState();
 #endif
